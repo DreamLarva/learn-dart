@@ -52,12 +52,13 @@ void main() {
     }
   }
   /**
-   * Built-in types(内置的类型)
+   * Built-in types(内建的类型)
    *
    * numbers
    * strings
    * booleans
-   * lists (也被称之为 arrays)
+   * lists
+   * sets
    * maps
    * runes (用于在字符串中表示 Unicode 字符)
    * symbols
@@ -246,15 +247,200 @@ multi-line string.""";
     // 如果用字面量初始化 那么 Dart 能推断出正确的 类型
     list[1] = 2;
     // list[1] = "2";// error
+    assert(list.length == 3);
+    assert(list[1] == 2);
+
+    var constantList = const [1, 2, 3];
+    // constantList[1] = 1; // Uncommenting this causes an error.
 
     const list_1 = [1, 2, 3];
-    list_1[1] = 2; // ok
-    list_1[4] = 2; // ok
+    // list_1[1] = 2; // 运行时错误
+    // list_1[4] = 2; // 运行时错误
     final list_2 = const [1, 2, 3];
-    list_2[1] = 2; // ok
-    list_2[4] = 2; // ok
+    // list_2[1] = 2; // 运行时错误
+    // list_2[4] = 2; // 运行时错误
 
     // 和 js 一样 list[0] 为 头元素 list[list.length -1 ] 为尾元素
+  }
+  /**
+   * Dart 2.3 新增的  spread operator (...) and the null-aware spread operator (...?)
+   * 类似 js 的拓展运算符
+   * */
+  {
+    var list = [1, 2, 3];
+    var list2 = [0, ...list]; // 展开
+    assert(list2.length == 4);
+  }
+  {
+    var list;
+    var sample1 = [];
+    // 能够在 list 拓展运算符 后的 只能是 list null 和未初始化变量(dynamic) 类型
+    var list2 = [0, ...?list, ...?[], ...?null]; // 有才展开
+    assert(list2.length == 1);
+  }
 
+  /**
+   * Dart 2.3 集合推导 collection if and collection for
+   * */
+  {
+    // if
+    var promoActive = true;
+    var nav = ['Home', 'Furniture', 'Plants', if (promoActive) 'Outlet'];
+
+    // for
+    var listOfInts = [1, 2, 3];
+    var listOfStrings = ['#0', for (var i in listOfInts) '#$i'];
+    assert(listOfStrings[1] == '#1');
+  }
+
+  /**
+   * Sets 集合
+   * >=  Dart 2.2 版本
+   * */
+  {
+    // 使用 {} 字面量 生成 集合
+    var halogens = {'fluorine', 'chlorine', 'bromine', 'iodine', 'astatine'};
+    // 能够自动推断类型s
+
+    // 初始化一个 空的集合
+    var names = <String>{}; // 空集合
+    Set<String> names1 = {}; // This works, too.
+    var names2 = {}; // Creates a map, not a set.
+
+    /**
+     * set or map ? set 的语法 和 map 的语法相似. 因为 map的字面量先被实现,所以{} 默认为Map 类型.
+     * 如果你忘了 {}上的类型声明,Dart 则生成一个对象类型为 Map<dynamic, dynamic>.
+     * */
+
+    var elements = <String>{};
+    elements.add('fluorine');
+    elements.addAll(halogens); // addAll 方法参数 必须是 一个 Iterable 类型
+
+    /**
+     * length 属性 显示集合中 元素的数量
+     * */
+    assert(elements.length == 5);
+
+    /**
+     * 使用 const 生成 一个 编译时 的常量
+     * */
+    final constantSet = const {
+      'fluorine',
+      'chlorine',
+      'bromine',
+      'iodine',
+      'astatine',
+    };
+    // constantSet.add('helium'); // 运行时报错
+    /**
+     * Dart 2.3版本后 set 也能使用
+     * ...
+     * ...?
+     * 推导(if,for)
+     * */
+    {
+      var isIf;
+      var set_1 = {"1"};
+      var list_1 = ["4"];
+      var set_2 = {...set_1, "2", ...?isIf, if (isIf == null) "3", ...list_1};
+      print(set_2); // {1, 2, 3, 4}
+    }
+  }
+
+  /**
+   * Map
+   * 一般而言 map 是一个对象 关联 键和值
+   * 键 和  值可以是任何对象
+   * 同样的键 只能有一个 但可以多个键有相同的值
+   * */
+  {
+    var gifts = {
+      // Key:    Value
+      'first': 'partridge',
+      'second': 'turtledoves',
+      'fifth': 'golden rings'
+    };
+
+    var nobleGases = {
+      2: 'helium',
+      10: 'neon',
+      18: 'argon',
+    };
+
+//    nobleGases[1] = 1; // error
+//    nobleGases["2"] = "1"; // error
+    /**
+     * Dart 推断 gifts 类型为 Map<String, String>
+     * nobleGases 类型为 Map<int, String>
+     *   初始化后 给予 错误类型的 键 或 值 都会报错
+     * Dart 初始化 Map 时 new 关键字 为可选
+     * */
+    {
+      var gifts = Map();
+      gifts['first'] = 'partridge';
+      gifts['second'] = 'turtledoves';
+      gifts['fifth'] = 'golden rings'; // type Map<dynamic,dynamic>
+      gifts[1] = 1; // ok
+
+      var nobleGases = Map();
+      nobleGases[2] = 'helium';
+      nobleGases[10] = 'neon';
+      nobleGases[18] = 'argon';
+    }
+    /**
+     * length 属性 键值对的数量
+     * */
+    {
+      var gifts = {'first': 'partridge'}; // key 上的 '' 为必须
+      gifts['fourth'] = 'calling birds'; // 添加一个键值对
+
+      assert(gifts.length == 2);
+    }
+    /**
+     * 使用const 生成 map 常量
+     * */
+    {
+      final constantMap = const {
+        2: 'helium',
+        10: 'neon',
+        18: 'argon',
+      };
+    }
+    /**
+     * 同set 和 list 一样 迭代器能用的 他也能用
+     * */
+    {
+      var unInitialized;
+      var map_1 = {1: 1};
+      var map_2 = {
+        ...map_1,
+        2: 2,
+        ...?unInitialized,
+        if (unInitialized == null) 3: 3
+      };
+    }
+  }
+
+  /**
+   * Runes(符文) 类型
+   * Dart 中 runes 代表  UTF-32 编码的
+   * Dart 字符串 是 UTF-16 的 要使用  32-bit Unicode 需要一个新的语法 也就是 rune
+   *
+   * 通常 表示 Unicode 使用\uXXXX(一个4位16进制的值)
+   * 如果要使用 一个多余4位的  或者 小于四位 就需要 加上 { }
+   * 如 \u{1f600}
+   *
+   * string 类型 有几个属性 能够得到 确切的 rune 信息
+   * codeUnitAt codeUnit 属性返回 16位 代码单元
+   * */
+  {
+    var clapping = '\u{1f44f}';
+    print(clapping);
+    print(clapping.codeUnits); // [55357, 56399]
+    print(clapping.runes.toList()); // [128079]
+
+    Runes input = new Runes(
+        '\u2665  \u{1f605}  \u{1f60e}  \u{1f47b}  \u{1f596}  \u{1f44d}');
+    print(new String.fromCharCodes(input));
   }
 }
