@@ -6,10 +6,9 @@ void main() {
   int lineCount;
   assert(lineCount == null);
 
-  /** Optional types（可选的类型）*/
+  /** Optional types（可选的类型声明）*/
   {
     String name = 'Bob'; // 可以手动在初始化的时候声明对应的类型虽然没有任何必要
-
   }
 
   /**
