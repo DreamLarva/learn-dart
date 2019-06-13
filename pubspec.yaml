@@ -1,0 +1,8 @@
+name: dartlearn
+version: 0.0.1
+description: A sample web application
+dependencies:
+  meta: ^1.1.7
+
+dev_dependencies:
+#  unittest: any
